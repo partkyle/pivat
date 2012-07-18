@@ -8,6 +8,7 @@ if (Meteor.is_client) {
   }
 
   var refreshProjects = function() {
+    Session.set('processing', true);
     Meteor.call('projects', Session.get('token'), function(err, result) {
       var projects = $(result.content).find('project').map(function (v) {
         var self = $(this);
@@ -15,6 +16,7 @@ if (Meteor.is_client) {
       });
 
       Session.set('projects', projects);
+      Session.set('processing', false);
     });
   }
 
@@ -31,6 +33,10 @@ if (Meteor.is_client) {
     'change input': function(e) {
       setToken(e.target.value);
     }
+  }
+
+  Template.processing.processing = function() {
+    return Session.get('processing');
   }
 
   Template.projects.projects = function() {

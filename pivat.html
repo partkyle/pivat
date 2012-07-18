@@ -10,6 +10,7 @@
 
 <template name="wrapper">
 <div class="container">
+  {{> processing}}
   {{> projects}}
 </div>
 </template>
@@ -25,6 +26,14 @@
     </div>
   </div>
 </div>
+</template>
+
+<template name="processing">
+{{#if processing}}
+<div class="progress progress-striped active">
+  <div class="bar" style="width: 40%"></div>
+</div>
+{{/if}}
 </template>
 
 <template name="projects">
