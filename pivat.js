@@ -1,19 +1,37 @@
-
 if (Meteor.is_client) {
-  var token = document.cookie || prompt('Pivotal token pls!');
-  document.cookie = token;
+  var setToken = function(token) {
+    Session.set('token', token);
+    $.cookie('token', token);
 
-  var projects;
+    // refresh projects maybe?
+    refreshProjects();
+  }
 
-  Meteor.call('projects', token, function(err, result) {
-    console.log();
-    projects = $(result.content).find('project').map(function (v) {
-      var self = $(this);
-      return { id: self.find('id').first().text(), name: self.find('name').first().text() };
+  var refreshProjects = function() {
+    Meteor.call('projects', Session.get('token'), function(err, result) {
+      var projects = $(result.content).find('project').map(function (v) {
+        var self = $(this);
+        return { id: self.find('id').first().text(), name: self.find('name').first().text() };
+      });
+
+      Session.set('projects', projects);
     });
+  }
 
-    Session.set('projects', projects);
-  });
+  if ($.cookie('token')) {
+    Session.set('token', $.cookie('token'));
+    refreshProjects();
+  }
+
+  Template.navbar.token = function() {
+    return Session.get('token');
+  };
+
+  Template.navbar.events = {
+    'change input': function(e) {
+      setToken(e.target.value);
+    }
+  }
 
   Template.projects.projects = function() {
     return Session.get('projects');
